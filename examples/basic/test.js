@@ -1,4 +1,4 @@
-var Hyjack = require('./index');
+var Hyjack = require('../../index');
 var hyjack = new Hyjack({noWatcher: true});
 var async = require('async');
 var request = require('request');
