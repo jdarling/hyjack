@@ -3,8 +3,10 @@ var async = require('async');
 var request = require('request');
 
 describe('Hyjack basic tests', function(){
+
   describe('Library', function(){
     var Hyjack;
+    var os = require('os');
     it('Should load successfully', function(done){
       Hyjack = require('../index');
       done();
@@ -25,6 +27,47 @@ describe('Hyjack basic tests', function(){
       var hooks = {};
       var hyjack = new Hyjack({hooks: hooks});
       done();
+    });
+    it('Should allow events to be emitted back for use', function(done){
+      var hyjack;
+      var hooks = {
+        'Capture when os.type called': {
+          type: 'method',
+          method: 'override',
+          unit: 'os',
+          methodName: 'type',
+          callback: function(_super){
+            hyjack.emit('done', _super);
+          }
+        }
+      };
+      hyjack = new Hyjack({hooks: hooks, sandbox: {fs: require('fs')}});
+      hyjack.on('done', function(_super){
+        hyjack.clearHooks();
+        done();
+      });
+      os.type();
+    });
+    it('Should provide a high percision counter', function(done){
+      var hyjack;
+      var hooks = {
+        'Capture when os.type called': {
+          type: 'method',
+          method: 'override',
+          unit: 'os',
+          methodName: 'type',
+          callback: function(_super){
+            hyjack.emit('done', counter());
+          }
+        }
+      };
+      hyjack = new Hyjack({hooks: hooks, sandbox: {fs: require('fs')}});
+      hyjack.on('done', function(counterValue){
+        assert(counterValue);
+        hyjack.clearHooks();
+        done();
+      });
+      os.type();
     });
   });
 
@@ -49,8 +92,8 @@ describe('Hyjack basic tests', function(){
     });
     it('Should wrap http.Agent.free calls', function(done){
       hyjack.on('agent::free', function(){
-        done();
         hyjack.clearHooks();
+        done();
       });
       request('https://www.google.com/');
     });
@@ -68,13 +111,66 @@ describe('Hyjack basic tests', function(){
           unit: 'os',
           methodName: 'type',
           callback: function(_super){
+            hyjack.clearHooks();
+            hyjack.emit('done', {_super: _super, self: this});
+          }
+        }
+      };
+      hyjack = new Hyjack({hooks: hooks, sandbox: {done: done, assert: assert}});
+      hyjack.on('done', function(info){
+        assert(info._super);
+        assert(info._super.call(info.self));
+        done();
+      });
+      os.type();
+    });
+  });
+
+  describe('Injection', function(){
+    var Hyjack = require('../index');
+    var os = require('os');
+    it('Should allow us to inject custom libraries', function(done){
+      var hyjack;
+      var hooks = {
+        'Capture when os.type called': {
+          type: 'method',
+          method: 'override',
+          unit: 'os',
+          methodName: 'type',
+          callback: function(_super){
+            if(!net){
+              throw new Error('fs does not exist!');
+            }
+            hyjack.emit('done', _super);
+          }
+        }
+      };
+      hyjack = new Hyjack({hooks: hooks, sandbox: {net: require('net')}});
+      hyjack.on('done', function(_super){
+        assert(_super);
+        assert(_super.call(this));
+        hyjack.clearHooks();
+        done();
+      });
+      os.type();
+    });
+    it('Should allow us to inject custom methods and use them', function(done){
+      var hyjack;
+      var hooks = {
+        'Capture when os.type called': {
+          type: 'method',
+          method: 'override',
+          unit: 'os',
+          methodName: 'type',
+          callback: function(_super){
             assert(_super);
             assert(_super.call(this));
+            hyjack.clearHooks();
             done();
           }
         }
       };
-      hyjack = new Hyjack({hooks: hooks});
+      hyjack = new Hyjack({hooks: hooks, sandbox: {assert: assert, done: done}});
       os.type();
     });
   });
