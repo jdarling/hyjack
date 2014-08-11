@@ -29,6 +29,29 @@ Yeah, I know, but there is already a Node module named Hijack
 (https://www.npmjs.org/package/hijack) but it seems to be dead.  In fact it
 did almost the same thing that Hyjack does.
 
+Installation
+============
+
+```
+npm install hyjack
+```
+
+Tests
+=====
+
+Tests are developed using Mocha.  If you want to test make sure you have
+development dependencies installed and that you have Mocha installed globally.
+
+```
+mocha test
+```
+
+or
+
+```
+npm test
+```
+
 Important Notes
 ===============
 
