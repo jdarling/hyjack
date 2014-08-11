@@ -193,3 +193,25 @@ Setup your hyjack.config file as follows:
 ```
 
 Then watch the messages start appearing.
+
+Impact
+======
+
+The impact Hyjack seems to have on your project is minimal.  Taking the load
+test example and running it on an i5 2nd Generation machine with 8GB ram and
+a 256GB Sata 6 SSD the output is consistently something similar to the following:
+
+```
+No hyjack (min, max, avg, number):  88ms 228ms 154ms 10,000 iterations
+With hyjack (min, max, avg, number):  76ms 338ms 150ms 10,000 iterations
+```
+
+That is 10,000 iterations of grabbing the same index page through a local proxy
+and logging it.  This is done using Async eachLimit with a top limit of 10.
+
+Really the important numbers above are the max response time.  Without Hyjack
+this is stays 220ms and with Hyjack it stays around 330ms.  For a worst case
+impact of about 110ms.  These impacts are not seen very often.  Usually when
+the STDOUT is being initialized or when it overflows thus forcing a clear.
+When output is piped to /dev/null or a noop function it seems to add about 40ms
+on the top side.
