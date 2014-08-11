@@ -2,8 +2,11 @@ require('longjohn');
 var config = require('../lib/config').config;
 var cluster = require('cluster');
 var useCluster = (process.env.NODE_ENV==='production')||config.cluster;
-var Hyjack = require('../../../index');
-new Hyjack();
+if(!(config.noHyjack||config['no-hyjack'])){
+  console.log('Loading Hyjack');
+  var Hyjack = require('../../../index');
+  new Hyjack();
+}
 
 if(!useCluster){
   console.log('Running in single threaded model');
