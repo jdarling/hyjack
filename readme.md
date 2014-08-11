@@ -79,6 +79,12 @@ Below are some examples of how you could use Hyjack within your projects.
 This is not the only things you can do with Hyjack, but they are a good
 starting point.
 
+Also, make sure and check out the Cookbook at
+https://github.com/jdarling/hyjack/wiki for more Recipes on how to make use
+of Hyjack.  The Cookbook is still quite young, but I'm open to Pull Requests to
+add new Recipes and will be adding new Recipes as I create them for my own
+projects.
+
 Setup
 -----
 
