@@ -19,6 +19,16 @@ into existing event emitter based objects on the fly to change the way your
 application logs or details information.  Combine it with something like statsd
 and you have a really powerful reporting integration system.
 
+One other think that Hyjack lets you do is intercept (but not repleace)
+the default methods and prototype methods on existing libraries, and Objects.
+
+It's Hijack!
+------------
+
+Yeah, I know, but there is already a Node module named Hijack
+(https://www.npmjs.org/package/hijack) but it seems to be dead.  In fact it
+did almost the same thing that Hyjack does.
+
 Important Notes
 ===============
 
