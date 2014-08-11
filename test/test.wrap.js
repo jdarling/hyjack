@@ -50,8 +50,32 @@ describe('Hyjack basic tests', function(){
     it('Should wrap http.Agent.free calls', function(done){
       hyjack.on('agent::free', function(){
         done();
+        hyjack.clearHooks();
       });
       request('https://www.google.com/');
+    });
+  });
+
+  describe('Wrap super method', function(){
+    var Hyjack = require('../index');
+    var hyjack;
+    it('Should allow us to get called when the source method is called', function(done){
+      var os = require('os');
+      var hooks = {
+        'Capture when os.type called': {
+          type: 'method',
+          method: 'override',
+          unit: 'os',
+          methodName: 'type',
+          callback: function(_super){
+            assert(_super);
+            assert(_super.call(this));
+            done();
+          }
+        }
+      };
+      hyjack = new Hyjack({hooks: hooks});
+      os.type();
     });
   });
 });
