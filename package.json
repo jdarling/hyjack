@@ -1,6 +1,6 @@
 {
   "name": "hyjack",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Hyjack.js lets you tie into event emitter objects and do things without changing your code.",
   "main": "index.js",
   "scripts": {
