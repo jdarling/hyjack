@@ -10,22 +10,23 @@ var noop = function(){};
 
 var samples = [];
 var NUM_TESTS = 10000;
+var NUM_TESTS_TOTAL = NUM_TESTS * 2;
 
 var log = console.log;
 
-var startServer = function(noJyjack){
+var startServer = function(noHyjack){
   log('Starting server');
   var args = ['server.js'];
-  if(noJyjack){
+  if(noHyjack){
     args.push('--no-hyjack');
   }
   server = spawn('node', args);
 
   server.stdout.on('data', function (data) {
-    log(data.toString());
+    log(data.toString().trim());
   });
   server.stderr.on('data', function (data) {
-    log(data.toString());
+    log(data.toString().trim());
   });
   server.on('close', function(){
     log('Server shutdown');
@@ -36,8 +37,14 @@ var shutdownServer = function(){
   server.kill();
 };
 
+var tst = 0, last = -1;
 var runTest = function(callback){
   async.eachLimit(new Array(NUM_TESTS), 10, function(none, next){
+    var curr = Math.floor((tst++ / NUM_TESTS_TOTAL)*100);
+    if(curr>last){
+      console.log(curr+'% Complete ('+tst+'/'+NUM_TESTS_TOTAL+')');
+      last = curr;
+    }
     var start = counter();
     request(target, function(){
       samples.push(Math.ceil(counter(start)));
@@ -63,13 +70,18 @@ var runTest = function(callback){
 }
 
 startServer(true);
+console.log('Waiting for server to start.');
 setTimeout(function(){
   runTest(function(min, max, avg, num){
     samples = [];
     startServer(false);
-    runTest(function(min2, max2, avg2, num2){
-      log('No hyjack (min, max, avg, number): ', min+'ms', max+'ms', avg+'ms', num+' itterations');
-      log('With hyjack (min, max, avg, number): ', min2+'ms', max2+'ms', avg2+'ms', num2+' itterations');
-    });
+
+    console.log('Waiting for server to start.');
+    setTimeout(function(){
+      runTest(function(min2, max2, avg2, num2){
+        log('No hyjack (min, max, avg, number): ', min+'ms', max+'ms', avg+'ms', num+' itterations');
+        log('With hyjack (min, max, avg, number): ', min2+'ms', max2+'ms', avg2+'ms', num2+' itterations');
+      });
+    }, 1000);
   });
 }, 1000);
