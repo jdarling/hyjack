@@ -186,6 +186,15 @@ Setup your hyjack.config file as follows:
         conversation.duration = conversation.complete - conversation.start;
         conversation.completed = new Date();
         try{ // capture the uri component of the req object if it exists
+          // This same statement could be written as
+          //   conversation.uri =
+          //        (socket._httpMessage.res && socket._httpMessage.res.request)?
+          //          socket._httpMessage.res.request.uri:false;
+          // this would require two boolean evaluations that should not be
+          // required since the socket._httpMessage.res.request.uri component
+          // should exist.  If the case were that it was unknown if the component
+          // would exist then a if or ternary operator would be faster than the
+          // try/catch implementation.
           conversation.uri = socket._httpMessage.res.request.uri;
         }catch(e){
         }
@@ -201,7 +210,7 @@ Then watch the messages start appearing.
 Impact
 ======
 
-The impact Hyjack seems to have on your project is minimal.  Taking the load
+When used properly the impact of Hyjack on a project is minimal.  Taking the load
 test example and running it on an i5 2nd Generation machine with 8GB ram and
 a 256GB Sata 6 SSD the output is consistently something similar to the following:
 
@@ -219,3 +228,46 @@ impact of about 110ms.  These impacts are not seen very often.  Usually when
 the STDOUT is being initialized or when it overflows thus forcing a clear.
 When output is piped to /dev/null or a noop function it seems to add about 40ms
 on the top side.
+
+Performance Notes
+=================
+
+  * In a high utilization environment never use console.log as your logger,
+    instead overwrite the Hyjack.log instance method with a high speed
+    alternative like pushing the contents to Redis, StatsD, etc...
+  * Never perform complex tasks in your handlers.  Never.  Not even for testing.
+    * It is better to perform complex logic outside of your calls to ensure you
+      do not impact your applications performance.  Push raw information to a
+      different system and in that system perform your logic.  Examples to come.
+    * If you are doing complex logic inside your calls and submit a ticket about
+      a problem your ticket will be closed with the suggestion that you move the
+      complex logic out of your call.
+    * Yes, a Regular Expression match on a string is "Complex Logic".  Simple
+      if matching is not complex.
+    * In case you need to do something that requires logic use try/catch blocks.
+      They are faster and have lower overhead than most regular expressions.
+    * Try/catch can be slow, if may be faster.
+
+Version History
+===============
+
+v0.1.0
+  * Started adding version history to readme.md
+  * Switched the API and backend code to change the way Hyjack calls handlers to
+    lower (does not completely remove) the chance of a handler causing unknown
+    issues within the main codebase.  Care MUST be taken when developing
+    handlers to keep them as short running as possible.
+  * Handlers were moved from execute before default handler to execute after
+    default handler using process.nextTick()
+  * Handlers are now passed with a scope that contains source (calling object
+    reference), counter (High percision timer when origional event was fired),
+    and specific handler type details:
+      * _super - In the case when using to capture method calls _super is
+        provided as a reference back to the source method.
+      * map - In the case when an event to event timer is being used then this
+        is a WeakMap provided to capture references to maintain state.  See the
+        "Logging outgoing HTTP requests" for usage.
+
+v0.0.x
+  * Prototype of the project, found to allow leakage when used with long running
+    handlers under high load circumstances.
