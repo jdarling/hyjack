@@ -79,8 +79,8 @@ setTimeout(function(){
     console.log('Waiting for server to start.');
     setTimeout(function(){
       runTest(function(min2, max2, avg2, num2){
-        log('No hyjack (min, max, avg, number): ', min+'ms', max+'ms', avg+'ms', num+' itterations');
-        log('With hyjack (min, max, avg, number): ', min2+'ms', max2+'ms', avg2+'ms', num2+' itterations');
+        log('No hyjack (min, max, avg, number): ', min+'ms', max+'ms', avg+'ms', num+' iterations');
+        log('With hyjack (min, max, avg, number): ', min2+'ms', max2+'ms', avg2+'ms', num2+' iterations');
       });
     }, 1000);
   });

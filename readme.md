@@ -215,8 +215,8 @@ test example and running it on an i5 2nd Generation machine with 8GB ram and
 a 256GB Sata 6 SSD the output is consistently something similar to the following:
 
 ```
-No hyjack (min, max, avg, number):  88ms 228ms 154ms 10,000 iterations
-With hyjack (min, max, avg, number):  76ms 338ms 150ms 10,000 iterations
+No hyjack (min, max, avg, number):  92ms 192ms 139ms 10,000 iterations
+With hyjack (min, max, avg, number):  89ms 200ms 143ms 10,000 iterations
 ```
 
 That is 10,000 iterations of grabbing the same index page through a local proxy
