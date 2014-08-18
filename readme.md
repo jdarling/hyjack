@@ -223,11 +223,16 @@ That is 10,000 iterations of grabbing the same index page through a local proxy
 and logging it.  This is done using Async eachLimit with a top limit of 10.
 
 Really the important numbers above are the max response time.  Without Hyjack
-this is stays 220ms and with Hyjack it stays around 330ms.  For a worst case
-impact of about 110ms.  These impacts are not seen very often.  Usually when
-the STDOUT is being initialized or when it overflows thus forcing a clear.
-When output is piped to /dev/null or a noop function it seems to add about 40ms
-on the top side.
+this stays around 140ms and with Hyjack it stays around 140ms.  This isn't quite
+correct though, because while we don't impact the caller in version 0.1.x like
+we did in 0.0.x we still have overhead that is getting processed at some point.
+The overhead is moved out of cycle using process.nextTick to allow the system to
+complete any processing that it needs to.
+
+This results in an additional overhead of two new method calls, an Array join,
+and a closure creation for 0.1.x.  On the test machine this adds at worst case
+an overhead to the call stack of 25 nanoseconds to queue up the handlers for
+later processing.
 
 Performance Notes
 =================
@@ -246,7 +251,7 @@ Performance Notes
       if matching is not complex.
     * In case you need to do something that requires logic use try/catch blocks.
       They are faster and have lower overhead than most regular expressions.
-    * Try/catch can be slow, if may be faster.
+    * Try/catch can be slow, if may be faster.  It all depends on the situation.
 
 Version History
 ===============
