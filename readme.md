@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jdarling/hyjack.svg?branch=master)](https://travis-ci.org/jdarling/hyjack)
+
 Hyjack.js
 =========
 
